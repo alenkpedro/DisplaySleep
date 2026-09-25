@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon\r
+._*
+
+# Build Artifacts
+build/
+*.app/
+*.o
+*.dSYM/
+.build/
+
+# Xcode / Swift
+xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+DerivedData/
+
+# Temporary files
+/tmp/
+*.swp
+*~
