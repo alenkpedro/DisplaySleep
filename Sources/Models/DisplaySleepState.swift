@@ -185,6 +185,10 @@ public final class DisplaySleepState {
             ClamshellWatcher.shared.start { [weak self] in
                 Task { @MainActor in
                     self?.lastSleepTime = Date()
+                    if self?.soundFeedback == true {
+                        PowerService.playFeedbackSound()
+                    }
+                    PowerService.sleepDisplay()
                     PowerService.sleepSystem()
                 }
             }
