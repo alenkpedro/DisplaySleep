@@ -2,6 +2,9 @@ import SwiftUI
 
 public struct ContentView: View {
     @Bindable var state: DisplaySleepState
+    var closeAction: (() -> Void)? = nil
+    
+    @State private var isSettingsHovered = false
     @State private var isQuitHovered = false
     
     public var body: some View {
@@ -29,30 +32,70 @@ public struct ContentView: View {
                     ))
             }
             
-            // Footer Bar
-            HStack {
-                Text("v1.0.0 • pmset utility")
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
-                    .foregroundColor(.secondary.opacity(0.7))
+            // Bottom Action Bar (Ajustes & Sair) styled like Vorssaint
+            HStack(spacing: 10) {
+                // Ajustes Button
+                Button {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        state.isSettingsExpanded.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 11, weight: .semibold))
+                        Text(state.isSettingsExpanded ? "Fechar Ajustes" : "Ajustes")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(state.isSettingsExpanded ? .accentColor : .primary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color(nsColor: .controlBackgroundColor).opacity(state.isSettingsExpanded ? 0.9 : 0.5))
+                    }
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .strokeBorder(
+                                state.isSettingsExpanded ?
+                                Color.accentColor.opacity(0.3) :
+                                Color.primary.opacity(isSettingsHovered ? 0.15 : 0.08),
+                                lineWidth: 1
+                            )
+                    }
+                }
+                .buttonStyle(.plain)
+                .onHover { isSettingsHovered = $0 }
                 
-                Spacer()
-                
+                // Sair Button
                 Button {
                     NSApp.terminate(nil)
                 } label: {
-                    HStack(spacing: 4) {
+                    HStack(spacing: 6) {
                         Image(systemName: "power")
-                            .font(.system(size: 9, weight: .bold))
-                        Text("Encerrar")
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.system(size: 11, weight: .bold))
+                        Text("Sair")
+                            .font(.system(size: 12, weight: .medium))
                     }
-                    .foregroundColor(isQuitHovered ? .red : .secondary)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 3)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(isQuitHovered ? Color.red.opacity(0.12) : Color.clear)
-                    )
+                    .foregroundColor(isQuitHovered ? .red : .primary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(
+                                isQuitHovered ?
+                                Color.red.opacity(0.12) :
+                                Color(nsColor: .controlBackgroundColor).opacity(0.5)
+                            )
+                    }
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .strokeBorder(
+                                isQuitHovered ?
+                                Color.red.opacity(0.35) :
+                                Color.primary.opacity(0.08),
+                                lineWidth: 1
+                            )
+                    }
                 }
                 .buttonStyle(.plain)
                 .onHover { isQuitHovered = $0 }
@@ -62,12 +105,7 @@ public struct ContentView: View {
             .padding(.top, 2)
         }
         .padding(14)
-        .frame(width: 320)
-        .background {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.25), radius: 20, x: 0, y: 10)
-        }
+        .frame(width: 310)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: state.isTimerActive)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: state.isSettingsExpanded)
     }

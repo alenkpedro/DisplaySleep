@@ -46,9 +46,13 @@ public final class DisplaySleepState {
     public var isSettingsExpanded: Bool = false
     public var lastSleepTime: Date? = nil
     
+    public var onStateChange: (() -> Void)?
+    public var requestClosePopover: (() -> Void)?
+    
     public var selectedIcon: MenuIconStyle = .moon {
         didSet {
             UserDefaults.standard.set(selectedIcon.rawValue, forKey: "SelectedMenuIcon")
+            onStateChange?()
         }
     }
     
@@ -130,6 +134,7 @@ public final class DisplaySleepState {
         PowerService.sleepDisplay()
         
         if autoDismissPopoverOnSleep {
+            requestClosePopover?()
             NSApp.hide(nil)
         }
     }
@@ -141,16 +146,19 @@ public final class DisplaySleepState {
         remainingSeconds = seconds
         activePresetLabel = label
         isTimerActive = true
+        onStateChange?()
         
         timerTask = Task { @MainActor in
             while self.remainingSeconds > 0 {
                 try? await Task.sleep(for: .seconds(1))
                 if Task.isCancelled { return }
                 self.remainingSeconds -= 1
+                self.onStateChange?()
             }
             
             if !Task.isCancelled {
                 self.isTimerActive = false
+                self.onStateChange?()
                 self.triggerInstantSleep()
             }
         }
@@ -163,6 +171,7 @@ public final class DisplaySleepState {
         remainingSeconds = 0
         totalTimerSeconds = 0
         activePresetLabel = ""
+        onStateChange?()
     }
     
     private func updateLidWatcher(_ enable: Bool) {
