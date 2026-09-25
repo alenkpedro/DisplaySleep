@@ -8,13 +8,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var popover: NSPopover!
     private let state = DisplaySleepState()
     
+    static func main() {
+        let app = NSApplication.shared
+        let delegate = AppDelegate()
+        app.delegate = delegate
+        app.run()
+    }
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         
         // Create Status Item in Menu Bar
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: state.statusIconName, accessibilityDescription: "DisplaySleep")
+            let image = NSImage(systemSymbolName: state.statusIconName, accessibilityDescription: "DisplaySleep")
+            image?.isTemplate = true
+            button.image = image
             button.imagePosition = .imageLeading
             button.target = self
             button.action = #selector(togglePopover(_:))
@@ -33,7 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         let hostingController = NSHostingController(rootView: contentView)
         popover.contentViewController = hostingController
         
-        // Layout and set initial size so it never renders with (0,0)
+        // Set initial content size so it is fully visible
         hostingController.view.layoutSubtreeIfNeeded()
         let fittingSize = hostingController.view.fittingSize
         popover.contentSize = NSSize(width: max(fittingSize.width, 310), height: max(fittingSize.height, 350))
@@ -68,7 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         if popover.isShown {
             popover.performClose(sender)
         } else {
-            // Update size to current content before showing
+            // Update size before displaying
             if let hosting = popover.contentViewController {
                 hosting.view.needsLayout = true
                 hosting.view.layoutSubtreeIfNeeded()
@@ -84,7 +93,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     
     private func updateStatusBarButton() {
         guard let button = statusItem.button else { return }
-        button.image = NSImage(systemSymbolName: state.statusIconName, accessibilityDescription: "DisplaySleep")
+        let image = NSImage(systemSymbolName: state.statusIconName, accessibilityDescription: "DisplaySleep")
+        image?.isTemplate = true
+        button.image = image
         if state.isTimerActive {
             button.title = " \(state.formattedRemainingTime)"
             button.font = NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .semibold)
