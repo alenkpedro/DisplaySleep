@@ -28,7 +28,7 @@ Unlike putting the entire Mac to sleep (`pmset sleepnow`), **`pmset displaysleep
 ## ✨ Features / Recursos
 
 - ⚡️ **Instant Sleep Action**: Big hero action card to run `/usr/bin/pmset displaysleepnow` with 1 click or shortcut (`⌘D`).
-- ⏱️ **Smart Timer Presets**: Quick countdown chips for **15s, 30s, 1m, 5m, 15m, 30m, 1h**.
+- ⏱️ **Smart Timer Presets**: Quick countdown chips for **15s, 30s, 1m, 5m, 10m, 15m, 30m, 1h**.
 - 📊 **Live Menu Bar Feedback**: Displays the active countdown timer directly in the macOS menu bar (e.g. `🌙 04:30`) with an animated circular progress ring inside the popover.
 - 🎨 **Customizable Menu Bar Icons**: Choose between Moon (`moon.fill`), Display (`display`), Sleep (`moon.zzz.fill`), or Bolt (`bolt.fill`).
 - 🪟 **Liquid Glass Native UI**: Designed with SwiftUI materials (`.ultraThinMaterial`), subtle border gradients, and smooth spring animations.

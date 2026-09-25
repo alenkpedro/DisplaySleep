@@ -13,7 +13,7 @@ public enum MenuIconStyle: String, CaseIterable, Identifiable {
     public var displayName: String {
         switch self {
         case .moon: return "Lua"
-        case .display: return "Monitor"
+        case .display: return "Tela"
         case .moonZzz: return "Sono"
         case .bolt: return "Raio"
         }
@@ -30,6 +30,7 @@ public struct TimerPreset: Identifiable, Equatable {
         TimerPreset(seconds: 30, label: "30s"),
         TimerPreset(seconds: 60, label: "1m"),
         TimerPreset(seconds: 300, label: "5m"),
+        TimerPreset(seconds: 600, label: "10m"),
         TimerPreset(seconds: 900, label: "15m"),
         TimerPreset(seconds: 1800, label: "30m"),
         TimerPreset(seconds: 3600, label: "1h")
