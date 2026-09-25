@@ -16,11 +16,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         if let button = statusItem.button {
             button.image = NSImage(systemSymbolName: state.statusIconName, accessibilityDescription: "DisplaySleep")
             button.imagePosition = .imageLeading
-            button.action = #selector(togglePopover(_:))
             button.target = self
+            button.action = #selector(togglePopover(_:))
+            button.sendAction(on: [.leftMouseDown])
         }
         
-        // Native NSPopover with triangular arrow caret ("perninha")
+        // Native NSPopover with caret ("perninha")
         popover = NSPopover()
         popover.behavior = .transient
         popover.animates = true
@@ -29,11 +30,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         let contentView = ContentView(state: state, closeAction: { [weak self] in
             self?.popover.performClose(nil)
         })
-        popover.contentViewController = NSHostingController(rootView: contentView)
+        let hostingController = NSHostingController(rootView: contentView)
+        popover.contentViewController = hostingController
+        
+        // Layout and set initial size so it never renders with (0,0)
+        hostingController.view.layoutSubtreeIfNeeded()
+        let fittingSize = hostingController.view.fittingSize
+        popover.contentSize = NSSize(width: max(fittingSize.width, 310), height: max(fittingSize.height, 350))
         
         // Connect state hooks
         state.onStateChange = { [weak self] in
             self?.updateStatusBarButton()
+        }
+        
+        state.onRequestResize = { [weak self] in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                if let hosting = self.popover.contentViewController {
+                    hosting.view.needsLayout = true
+                    hosting.view.layoutSubtreeIfNeeded()
+                    let newSize = hosting.view.fittingSize
+                    self.popover.contentSize = NSSize(width: max(newSize.width, 310), height: newSize.height)
+                }
+            }
         }
         
         state.requestClosePopover = { [weak self] in
@@ -45,10 +64,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     
     @objc func togglePopover(_ sender: AnyObject?) {
         guard let button = statusItem.button else { return }
+        
         if popover.isShown {
             popover.performClose(sender)
         } else {
-            // Anchor to button bounds with preferredEdge: .maxY to center popover and show the arrow ("perninha")
+            // Update size to current content before showing
+            if let hosting = popover.contentViewController {
+                hosting.view.needsLayout = true
+                hosting.view.layoutSubtreeIfNeeded()
+                let size = hosting.view.fittingSize
+                popover.contentSize = NSSize(width: max(size.width, 310), height: size.height)
+            }
+            
+            // Show anchored to button with .maxY (draws top arrow caret and centers horizontally)
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
             popover.contentViewController?.view.window?.makeKey()
         }

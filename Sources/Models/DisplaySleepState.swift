@@ -43,11 +43,16 @@ public final class DisplaySleepState {
     public var remainingSeconds: Int = 0
     public var totalTimerSeconds: Int = 0
     public var activePresetLabel: String = ""
-    public var isSettingsExpanded: Bool = false
+    public var isSettingsExpanded: Bool = false {
+        didSet {
+            onRequestResize?()
+        }
+    }
     public var lastSleepTime: Date? = nil
     
     public var onStateChange: (() -> Void)?
     public var requestClosePopover: (() -> Void)?
+    public var onRequestResize: (() -> Void)?
     
     public var selectedIcon: MenuIconStyle = .moon {
         didSet {
