@@ -23,13 +23,14 @@ SWIFT_SOURCES = \
 
 SWIFTC_FLAGS = -O -whole-module-optimization -parse-as-library
 
-.PHONY: all build run stop install uninstall clean help
+.PHONY: all build run stop install uninstall clean dmg help
 
 all: build
 
 help:
 	@echo "Comandos disponíveis:"
 	@echo "  make build      - Compila o binário e gera o pacote DisplaySleep.app"
+	@echo "  make dmg        - Gera o instalador DisplaySleep.dmg para distribuição"
 	@echo "  make run        - Executa o DisplaySleep na Menu Bar"
 	@echo "  make stop       - Encerra qualquer instância em execução do DisplaySleep"
 	@echo "  make install    - Instala DisplaySleep.app em ~/Applications"
@@ -45,6 +46,16 @@ $(BUNDLE_DIR): $(SWIFT_SOURCES) Info.plist Resources/AppIcon.icns
 	@cp Info.plist $(CONTENTS_DIR)/Info.plist
 	@cp Resources/AppIcon.icns $(RESOURCES_DIR)/AppIcon.icns
 	@echo "✅ Pacote $(BUNDLE_DIR) construído com sucesso!"
+
+dmg: build
+	@echo "📀 Criando imagem de disco $(APP_NAME).dmg..."
+	@rm -rf /tmp/$(APP_NAME)-dmg-staging build/$(APP_NAME).dmg
+	@mkdir -p /tmp/$(APP_NAME)-dmg-staging
+	@cp -R $(BUNDLE_DIR) /tmp/$(APP_NAME)-dmg-staging/
+	@ln -s /Applications /tmp/$(APP_NAME)-dmg-staging/Applications
+	@hdiutil create -volname "$(APP_NAME)" -srcfolder /tmp/$(APP_NAME)-dmg-staging -ov -format UDZO build/$(APP_NAME).dmg > /dev/null
+	@rm -rf /tmp/$(APP_NAME)-dmg-staging
+	@echo "✅ Instalador build/$(APP_NAME).dmg criado com sucesso!"
 
 run: build
 	@echo "🚀 Iniciando $(APP_NAME)..."

@@ -75,6 +75,7 @@ make install
 | Command | Description |
 |---|---|
 | `make build` | Compiles the Swift binary and bundles `DisplaySleep.app` |
+| `make dmg` | Generates the `DisplaySleep.dmg` installer image for distribution |
 | `make run` | Builds and launches `DisplaySleep.app` in the menu bar |
 | `make stop` | Quits any running instance |
 | `make install` | Installs `DisplaySleep.app` into `~/Applications` |
